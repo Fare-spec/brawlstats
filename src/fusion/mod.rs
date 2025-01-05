@@ -1,5 +1,6 @@
+use chrono::Local;
 use serde_json::{Map, Value};
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{self, BufReader, Write};
 
 
@@ -34,7 +35,14 @@ fn merge_json_objects(file_paths: &[&str], output_file: &str) -> io::Result<()> 
     Ok(())
 }
 
-pub fn merge_files(files:Vec<&str>) -> io::Result<()> {
-    merge_json_objects(&files, "merged.json")?;
+pub fn merge_files(files:Vec<&str>,path: &str) -> io::Result<()> {
+    merge_json_objects(&files, path)?;
+    for file in files {
+        if let Err(e) = fs::remove_file(file) {
+            eprintln!("Erreur lors de la suppression du fichier {}: {}", file, e);
+        } else {
+            println!("Fichier supprimé : {}", file);
+        }
+    }
     Ok(())
 }
